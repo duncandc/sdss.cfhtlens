@@ -31,8 +31,8 @@ def main():
     f = h5py.File(filepath+'catalogues/'+field+'.hdf5', 'r')
     W = f.get(field)
     R = np.load(filepath+'random_catalogues/'+field+'_randoms'+'.npy')
-    #print(W.dtype.names)
-    #print(R.dtype.names)
+    print(W.dtype.names)
+    print(R.dtype.names)
 
     #import sdss group catalogue
     filepath = '/scratch/dac29/output/processed_data/yang_groupcat/'
@@ -56,13 +56,11 @@ def main():
     #choose cfhtlens sample
     
     #choose random sample
-
-    print(np.min(GC['GROUP_Z']), np.max(GC['GROUP_Z']))
-
+    
     data_1 = np.column_stack((GC['RAgal'],GC['DECgal'],GC['GROUP_Z']))
     data_2 = np.column_stack((W['ALPHA_J2000'],W['DELTA_J2000']))
     r_bins = np.logspace(-2,1,10)
-    print(r_bins)
+    
     result = proj_cross_npairs_serial(data_1, data_2, r_bins, cosmo,\
                              weights_1=None, weights_2=None,\
                              wf=None, aux_1=None, aux_2=None)
