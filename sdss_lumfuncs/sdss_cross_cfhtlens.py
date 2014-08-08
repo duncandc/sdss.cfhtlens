@@ -54,8 +54,19 @@ def main():
     GC = GC[condition]
     
     #choose cfhtlens sample
+    condition_1 = (W['MAG_i']<24.5)
+    condition_2 = (W['MASK']==0)
+    condition = (condition_1 & condition_2)
+    W = W[condition]
+    
+    print("N1: {0},  N2: {1}".format(len(GC),len(W)))
     
     #choose random sample
+    conditon_1 = (R['flag']==0)
+    condition = condition_1
+    R = R[condition]
+    
+    print("N1: {0},  Nran: {1}".format(len(GC),len(R)))
     
     data_1 = np.column_stack((GC['RAgal'],GC['DECgal'],GC['GROUP_Z']))
     data_2 = np.column_stack((W['ALPHA_J2000'],W['DELTA_J2000']))
