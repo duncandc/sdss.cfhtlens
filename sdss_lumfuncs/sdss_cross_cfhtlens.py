@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+#Duncan Campbell
+#Yale University
+#August 8,2014
+#calculate projected cross correlation function for sdss groups x cfhtlens photometric 
+#  galaxies
+
 from __future__ import print_function, division
 import sys
 import numpy as np
@@ -46,6 +52,10 @@ def main():
     #combine conditionals
     condition = (condition_1 & condition_2 & condition_3)
     GC = GC[condition]
+    
+    #choose cfhtlens sample
+    
+    #choose random sample
 
     print(np.min(GC['GROUP_Z']), np.max(GC['GROUP_Z']))
 
