@@ -19,6 +19,13 @@ import sys
 
 
 def main():
+    """
+    Make a random catalogue for each tile in a field in the CFHTLens survey.
+    example: python make_cfhtlens_random_cat.py W3
+    
+    options: second user input specifies the mask file to use. A "?" argument returns the 
+    list of mask files.
+    """
     global filepath
     global savepath
     filepath = cu.get_data_path() + 'CFHTLens/masks/'
