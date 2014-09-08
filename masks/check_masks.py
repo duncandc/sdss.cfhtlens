@@ -49,6 +49,7 @@ def get_pixel(coords,w):
     """
     
     coords = np.array(coords)
+    np.reshape(coords,(1,2))
     pix = w.wcs_world2pix(coords, 0)
     pix = pix.astype(int)
     
