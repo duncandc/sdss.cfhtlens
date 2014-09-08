@@ -37,7 +37,7 @@ def main():
         filepath = cu.get_data_path()+'CFHTLens/masks/'
         data, w = read_mask(filepath, mask_filename)
         
-        x,y = get_pix((W['ALPHA_J2000'],W['DELTA_J2000']),w)
+        x,y = get_pixel((W['ALPHA_J2000'],W['DELTA_J2000']),w)
         fits_mask_value = data[y,x] #row,column ---> y,x
         print(i,object_mask_value,fits_mask_value)
         assert object_mask_value==fits_mask_value, "fits mask does not match catalogue mask!"
