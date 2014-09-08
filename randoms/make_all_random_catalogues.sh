@@ -11,7 +11,7 @@ python make_cfhtlens_random_cat.py W4 &
 
 #after all of those are complete, clean up the filenames
 wait
-/scratch/dac29/output/analysis/cfhtlens/clean_up_filenames.sh &
+sh /scratch/dac29/output/analysis/cfhtlens/clean_up_filenames.sh &
 
 #now, combine each tile catalogue into field catalogues
 wait
