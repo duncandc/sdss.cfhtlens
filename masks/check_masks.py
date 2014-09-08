@@ -27,7 +27,7 @@ def main():
     f = h5py.File(filepath+'catalogues/'+field+'.hdf5', 'r')
     W = f.get(field)
     
-    for i in range(0,N_test)
+    for i in range(0,N_test):
         ind = np.random.randint(0,len(W),1)
         field = W['field'][ind]
         object_mask_value = W['MASK'][ind]
