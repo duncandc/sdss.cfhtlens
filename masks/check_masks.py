@@ -48,6 +48,7 @@ def get_pixel(coords,w):
     get index of pixel
     """
     
+    coords = np.array(coords)
     pix = w.wcs_world2pix(coords, 0)
     pix = pix.astype(int)
     
