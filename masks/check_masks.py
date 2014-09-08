@@ -29,7 +29,7 @@ def main():
     W = f.get(field)
     
     for i in range(0,N_test):
-        ind = np.random.randint(0,len(W),1)
+        ind = np.random.randint(0,len(W),1)[0]
         field = W['field'][ind]
         object_mask_value = W['MASK'][ind]
         
