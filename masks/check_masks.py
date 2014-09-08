@@ -73,7 +73,7 @@ def read_mask(filepath,filename):
     from astropy.io import fits
     from astropy import wcs
     
-    hdulist = fits.open(filepath,filename, memmap=True)
+    hdulist = fits.open(filepath+filename, memmap=True)
     data = hdulist[0].data
     header = hdulist[0].header
     nxpix = header['NAXIS1']
