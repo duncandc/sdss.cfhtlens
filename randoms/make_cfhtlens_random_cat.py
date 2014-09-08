@@ -30,8 +30,17 @@ def main():
     field = sys.argv[1]
     print 'field:', field
 
-    filenames = os.listdir('/scratch/dac29/data/CFHTLens/masks/')
-    filenames = fnmatch.filter(filenames, field+'*.fits')
+    if len(sys.argv)>2:
+        filenames = sys.argv[2]
+    else:
+        filenames = os.listdir(cu.get_data_path()+'CFHTLens/masks/')
+        filenames = fnmatch.filter(filenames, field+'*.fits')
+    
+    if filenames == '?':
+        filenames = os.listdir(cu.get_data_path()+'CFHTLens/masks/')
+        filenames = fnmatch.filter(filenames, field+'*.fits')
+        print(filenames)
+        return 0
 
     p = Pool(8)
     p.map(do_work,filenames)
