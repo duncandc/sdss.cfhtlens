@@ -39,7 +39,7 @@ def main():
     if filenames == '?':
         filenames = os.listdir(cu.get_data_path()+'CFHTLens/masks/')
         filenames = fnmatch.filter(filenames, field+'*.fits')
-        print(filenames)
+        for filename in filenames: print(filename)
         return 0
 
     p = Pool(8)
