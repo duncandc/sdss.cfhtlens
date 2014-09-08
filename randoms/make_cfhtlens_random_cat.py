@@ -3,22 +3,19 @@
 #Author: Duncan Campbell
 #Written: August 12, 2013
 #Yale University
-#Description: make a random catalogue for each tile in the cfhtlens survey
+#Description: make a random catalogue for each tile in the cfhtlens survey.  Each tile has
+#a fixed angular number density.
 
 ###packages###
 import numpy as np
+import custom_utilities as cu
+from CFHTLens import inside_cfhtlens
 from astropy.io import fits
 from astropy import wcs
+from multiprocessing import Pool
 import os
 import fnmatch
 import sys
-import custom_utilities as cu
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import numpy as np
-import multiprocessing
-from multiprocessing import Pool
-from CFHTLens import inside_cfhtlens
 
 
 def main():
@@ -35,7 +32,7 @@ def main():
     else:
         filenames = os.listdir(cu.get_data_path()+'CFHTLens/masks/')
         filenames = fnmatch.filter(filenames, field+'*.fits')
-    
+    # a "?" as the 2nd user input returns the lost of mask files and exits.
     if filenames == '?':
         filenames = os.listdir(cu.get_data_path()+'CFHTLens/masks/')
         filenames = fnmatch.filter(filenames, field+'*.fits')
@@ -74,6 +71,7 @@ def do_work(filename):
         #determine if the points are inside the tile area
         result  = np.array(map(inside_cfhtlens.within_tile, ran_ra, ran_dec, center_ra, center_dec))
         #trim down the sample to the desired number of points
+        #!!!!! don't do this.  you want a constant angular number density, not N inside the tile.
         #ran_ra = ran_ra[result][0:N_points]
         #ran_dec = ran_dec[result][0:N_points]
         #ran_coords = ran_coords[result][0:N_points]
