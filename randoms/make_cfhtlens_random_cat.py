@@ -18,6 +18,7 @@ import matplotlib.image as mpimg
 import numpy as np
 import multiprocessing
 from multiprocessing import Pool
+from CFHTLens import inside_cfhtlens
 
 
 def main():
@@ -62,7 +63,7 @@ def do_work(filename):
         ran_coords = np.array(ran_coords)
 
         #determine if the points are inside the tile area
-        result  = np.array(map(cu.within_tile, ran_ra, ran_dec, center_ra, center_dec))
+        result  = np.array(map(inside_cfhtlens.within_tile, ran_ra, ran_dec, center_ra, center_dec))
         #trim down the sample to the desired number of points
         #ran_ra = ran_ra[result][0:N_points]
         #ran_dec = ran_dec[result][0:N_points]
@@ -71,7 +72,7 @@ def do_work(filename):
         ran_dec = ran_dec[result]
         ran_coords = ran_coords[result]
         #determine how many tiles the point is within(overlap regions)
-        num_tile = np.array(map(cu.num_tile, ran_ra, ran_dec))
+        num_tile = np.array(map(inside_cfhtlens.num_tile, ran_ra, ran_dec))
 
         #find pixel locations of random points
         ran_coords = np.array(ran_coords)
@@ -87,7 +88,6 @@ def do_work(filename):
         randoms['dec'] = ran_dec
         randoms['flag'] = data[ran_ypix, ran_xpix] #row,column ---> y,x
         randoms['num_tile'] = num_tile
-        print len(randoms)
 
         np.save(savepath+tile+'_randoms', randoms)
 
