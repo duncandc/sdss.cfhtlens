@@ -29,7 +29,7 @@ def main():
     global filepath
     global savepath
     filepath = cu.get_data_path() + 'CFHTLens/masks/'
-    savepath = cu.get_output_path() + 'analysis/cfhtlens/'
+    savepath = cu.get_output_path() + 'processed_data/CFHTLens/random_catalogues/'
 
     field = sys.argv[1]
     print 'field:', field

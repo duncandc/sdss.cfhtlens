@@ -14,8 +14,8 @@ import custom_utilities as cu
 
 
 def main():
-    filepath = cu.get_output_path() + 'analysis/cfhtlens/'
-    savepath = cu.get_output_path() + 'analysis/cfhtlens/'
+    filepath = cu.get_output_path() + 'processed_data/CFHTLens/random_catalogues/'
+    savepath = cu.get_output_path() + 'processed_data/CFHTLens/random_catalogues/'
 
     field1=sys.argv[1]
     field=field1.lower()
