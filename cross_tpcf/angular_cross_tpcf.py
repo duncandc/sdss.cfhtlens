@@ -92,7 +92,7 @@ def main():
         R = R[inds]
         
     print("Nran: {0}".format(len(R)))
-    
+    """
     if rank==0:
         #plot the field and randoms as a sanity check
         fig = plt.figure(figsize=plt.figaspect(0.5))
@@ -103,12 +103,12 @@ def main():
         ax.set_xlabel('ra')
         ax.set_ylabel('dec')
         ax.legend(('randoms','sdss centrals','cfhtlens'))
-    
+    """
     #get the data into the appropriate form
     data_1 = np.column_stack((GC['RAgal'],GC['DECgal']))
     data_2 = np.column_stack((W['ALPHA_J2000'],W['DELTA_J2000']))
     randoms = np.column_stack((R['ra'],R['dec']))
-    
+    """
     if rank==0:
         #place on surface of a unit sphere to plot for sanity check
         from halotools.utils.spherical_geometry import spherical_to_cartesian, chord_to_cartesian
@@ -136,7 +136,7 @@ def main():
         #ax.set_ylim([min(xyz_1[:,1]),max(xyz_1[:,1])])
         #ax.set_zlim([min(xyz_1[:,2]),max(xyz_1[:,2])])
         plt.show(block=False)
-    
+    """
     #define angular bins
     theta_bins = np.logspace(-3,0,25)
     bin_centers = (theta_bins[:-1]+theta_bins[1:])/2.0
@@ -148,7 +148,7 @@ def main():
     if rank==0:
         print(result)
         plt.figure()
-        plt.plot(bin_centers,result[1],'o-')
+        plt.plot(bin_centers,1.0+result[1],'o-')
         plt.yscale('log')
         plt.xscale('log')
         plt.xlabel(r'$\theta$')
