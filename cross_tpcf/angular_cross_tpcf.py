@@ -148,7 +148,7 @@ def main():
     if rank==0:
         print(result)
         plt.figure()
-        plt.plot(bin_centers,1.0+result[1],'o-')
+        plt.plot(bin_centers,result[1],'o-')
         plt.yscale('log')
         plt.xscale('log')
         plt.xlabel(r'$\theta$')
