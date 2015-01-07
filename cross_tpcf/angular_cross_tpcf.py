@@ -142,13 +142,13 @@ def main():
     bin_centers = (theta_bins[:-1]+theta_bins[1:])/2.0
     
     result = angular_two_point_correlation_function(data_1,theta_bins,sample2=data_2,randoms=randoms,\
-                                                    N_threads=1,estimator='Davis-Peebles',comm=comm)
+                                                    N_threads=1,estimator='Davis-Peebles',comm=comm, do_auto=False)
                                                 
     
     if rank==0:
         print(result)
         plt.figure()
-        plt.plot(bin_centers,result[1],'o-')
+        plt.plot(bin_centers,result,'o-')
         plt.yscale('log')
         plt.xscale('log')
         plt.xlabel(r'$\theta$')
