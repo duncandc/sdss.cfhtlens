@@ -140,6 +140,8 @@ def main():
     #define angular bins
     theta_bins = np.logspace(-3,0,25)
     bin_centers = (theta_bins[:-1]+theta_bins[1:])/2.0
+    if rank==0:
+        print(theta_bins)
     
     result = angular_two_point_correlation_function(data_1,theta_bins,sample2=data_2,randoms=randoms,\
                                                     N_threads=1,estimator='Davis-Peebles',comm=comm, do_auto=False)
