@@ -62,7 +62,7 @@ def main():
     
     #down sample?
     DS = True
-    f = 100
+    f = 10
     
     #choose cfhtlens sample
     condition_1 = ((W['MAG_y']<24.5) & (W['MAG_y']!=-99))
