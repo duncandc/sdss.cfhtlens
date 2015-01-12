@@ -61,7 +61,7 @@ def main():
     print("N1: {0}".format(len(GC)))
     
     #down sample?
-    DS = True
+    DS = False
     f = 10
     
     #choose cfhtlens sample
