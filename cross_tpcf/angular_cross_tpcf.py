@@ -31,6 +31,10 @@ def main():
 
     #define cosmology
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+    
+    #down sample?
+    DS = False
+    f = 10
  
     #import cfhtlens catalogues
     filepath = cu.get_output_path()+'processed_data/CFHTLens/'
@@ -61,10 +65,6 @@ def main():
     GC = GC[condition]
     
     print("N1: {0}".format(len(GC)))
-    
-    #down sample?
-    DS = False
-    f = 10
     
     #choose cfhtlens sample
     condition_1 = ((W['MAG_y']<24.5) & (W['MAG_y']!=-99))
