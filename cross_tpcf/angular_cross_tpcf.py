@@ -34,7 +34,7 @@ def main():
     
     #down sample?
     DS = False
-    f = 10
+    fs = 10
  
     #import cfhtlens catalogues
     filepath = cu.get_output_path()+'processed_data/CFHTLens/'
@@ -77,7 +77,7 @@ def main():
         N = len(W)
         np.random.seed(0)
         inds = np.random.permutation(np.arange(0,N))
-        inds = inds[0:N//f]
+        inds = inds[0:N//fs]
         W = W[inds]
     
     print("N2: {0}".format(len(W)))
@@ -90,7 +90,7 @@ def main():
         N = len(R)
         np.random.seed(0)
         inds = np.random.permutation(np.arange(0,N))
-        inds = inds[0:N//f]
+        inds = inds[0:N//fs]
         R = R[inds]
         
     print("Nran: {0}".format(len(R)))
