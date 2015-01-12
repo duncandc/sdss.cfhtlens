@@ -147,7 +147,8 @@ def main():
         print(theta_bins)
     
     result = angular_two_point_correlation_function(data_1,theta_bins,sample2=data_2,randoms=randoms,\
-                                                    N_threads=1,estimator='Davis-Peebles',comm=comm, do_auto=False)
+                                                    N_threads=1,estimator='Davis-Peebles',\
+                                                    comm=comm, do_auto=False, max_sample_size=int(1e8))
                                                 
     
     if rank==0:
