@@ -27,6 +27,8 @@ def main():
         catalogue = sys.argv[2]
     else: catalogue = 'sample3_L_model'
 
+    savepath = cu.get_plot_path()+'/analysis/sdss.cfhtlens/cross_correlations/'
+
     #define cosmology
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
  
@@ -149,12 +151,14 @@ def main():
     
     if rank==0:
         print(result)
-        plt.figure()
+        fig1 = plt.figure()
         plt.plot(bin_centers,result,'o-')
         plt.yscale('log')
         plt.xscale('log')
         plt.xlabel(r'$\theta$')
         plt.ylabel(r'$\omega(\theta)$')
+        filename = 'angular_correlation_'+field+'.pdf'
+        plt.savefig(savepath+filename)
         plt.show()
     
 
