@@ -27,14 +27,14 @@ def main():
         catalogue = sys.argv[2]
     else: catalogue = 'sample3_L_model'
 
-    savepath = cu.get_plot_path()+'/analysis/sdss.cfhtlens/cross_correlations/'
+    savepath = cu.get_plot_path()+'analysis/sdss.cfhtlens/cross_correlations/'
 
     #define cosmology
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     
     #down sample the number of points? Use this for testing purposes...
-    DS = False
-    fs = 10
+    DS = True
+    fs = 1000
  
     #import cfhtlens catalogues
     filepath = cu.get_output_path()+'processed_data/CFHTLens/'

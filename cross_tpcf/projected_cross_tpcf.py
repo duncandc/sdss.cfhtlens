@@ -172,7 +172,7 @@ def main():
         print(result)
         print(bin_centers)
         fig1 = plt.figure()
-        plt.plot(bin_centers,1+result,'o-')
+        plt.plot(bin_centers,result,'o-')
         plt.yscale('log')
         plt.xscale('log')
         plt.xlabel(r'$r_{\rm proj} [Mpc]$')
