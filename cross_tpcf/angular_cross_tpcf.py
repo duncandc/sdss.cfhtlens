@@ -34,7 +34,8 @@ def main():
     
     #down sample the number of points? Use this for testing purposes...
     DS = True
-    fs = 1000
+    fw = 100
+    fr = 100
  
     #import cfhtlens catalogues
     filepath = cu.get_output_path()+'processed_data/CFHTLens/'
@@ -69,15 +70,16 @@ def main():
     #choose cfhtlens sample
     condition_1 = ((W['MAG_y']<24.5) & (W['MAG_y']!=-99))
     condition_2 = ((W['MAG_i']<24.5) & (W['MAG_i']!=-99))
-    condition_1 = (condition_1 | condition_2)
-    condition_2 = (W['MASK']==0)
-    condition = (condition_1 & condition_2)
+    condition_12 = (condition_1 | condition_2)
+    condition_3 = (W['Z_B']<0.2)
+    condition_4 = (W['MASK']==0)
+    condition = ((condition_12 & condition_3) & condition_4)
     W = W[condition]
     if DS==True:
         N = len(W)
         np.random.seed(0)
         inds = np.random.permutation(np.arange(0,N))
-        inds = inds[0:N//fs]
+        inds = inds[0:N//fw]
         W = W[inds]
     
     print("N2: {0}".format(len(W)))
@@ -90,7 +92,7 @@ def main():
         N = len(R)
         np.random.seed(0)
         inds = np.random.permutation(np.arange(0,N))
-        inds = inds[0:N//fs]
+        inds = inds[0:N//fr]
         R = R[inds]
         
     print("Nran: {0}".format(len(R)))
@@ -157,6 +159,7 @@ def main():
         plt.plot(bin_centers,result,'o-')
         plt.yscale('log')
         plt.xscale('log')
+        plt.ylim([0.00001,1])
         plt.xlabel(r'$\theta$')
         plt.ylabel(r'$\omega(\theta)$')
         filename = 'angular_correlation_'+field+'.pdf'
