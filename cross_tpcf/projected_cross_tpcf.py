@@ -34,8 +34,9 @@ def main():
     
     #down sample the number of points? Use this for testing purposes...
     DS = True
-    fs = 1
- 
+    fw = 10
+    fr = 100
+    
     #import cfhtlens catalogues
     filepath = cu.get_output_path()+'processed_data/CFHTLens/'
     f = h5py.File(filepath+'catalogues/'+field+'_abbreviated.hdf5', 'r')
@@ -78,7 +79,7 @@ def main():
         N = len(W)
         np.random.seed(0)
         inds = np.random.permutation(np.arange(0,N))
-        inds = inds[0:N//fs]
+        inds = inds[0:N//fw]
         W = W[inds]
     
     if rank==0: print("N2: {0}".format(len(W)))
@@ -93,7 +94,7 @@ def main():
         N = len(R)
         np.random.seed(0)
         inds = np.random.permutation(np.arange(0,N))
-        inds = inds[0:N//fs]
+        inds = inds[0:N//fr]
         R = R[inds]
         
     if rank==0: print("Nran: {0}".format(len(R)))
@@ -104,6 +105,7 @@ def main():
     data_2 = np.column_stack((W['ALPHA_J2000'],W['DELTA_J2000']))
     randoms = np.column_stack((R['ra'],R['dec']))
     
+    """ 
     if rank==0:
         #plot the field and randoms as a sanity check
         fig = plt.figure(figsize=plt.figaspect(1))
@@ -155,7 +157,7 @@ def main():
         #ax.set_ylim([min(xyz_1[:,1]),max(xyz_1[:,1])])
         #ax.set_zlim([min(xyz_1[:,2]),max(xyz_1[:,2])])
         plt.show(block=False)
-    
+    """
     
     #define angular bins
     r_bins = np.logspace(-2,0,25)
@@ -176,7 +178,7 @@ def main():
         plt.yscale('log')
         plt.xscale('log')
         plt.xlabel(r'$r_{\rm proj} [Mpc]$')
-        plt.ylabel(r'$1+\omega(r_{\rm proj})$')
+        plt.ylabel(r'$\omega(r_{\rm proj})$')
         filename = 'projected_correlation_'+field+'.pdf'
         plt.savefig(savepath+filename)
         plt.show()
