@@ -33,7 +33,7 @@ def main():
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     
     #down sample the number of points? Use this for testing purposes...
-    DS = True
+    DS = False
     fw = 100
     fr = 100
  
@@ -159,7 +159,7 @@ def main():
         plt.plot(bin_centers,result,'o-')
         plt.yscale('log')
         plt.xscale('log')
-        plt.ylim([0.00001,1])
+        plt.ylim([0.0001,10])
         plt.xlabel(r'$\theta$')
         plt.ylabel(r'$\omega(\theta)$')
         filename = 'angular_correlation_'+field+'.pdf'
