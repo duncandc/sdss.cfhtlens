@@ -17,7 +17,7 @@ from mpi4py import MPI
 ####import modules########################################################################
 from math import pi, gamma
 from multiprocessing import Pool
-from halotools.mock_observables.pair_counters.npairs_mpi import npairs, wnpairs, specific_wnpairs, jnpairs
+from halotools.mock_observables.pair_counters.mpipairs import npairs, wnpairs, specific_wnpairs, jnpairs
 ##########################################################################################
 
 def main():
@@ -39,8 +39,8 @@ def main():
     
     #down sample the number of points? Use this for testing purposes...
     DS = True
-    fw = 10
-    fr = 100
+    fw = 100
+    fr = 1000
     
     #import cfhtlens catalogues
     filepath = cu.get_output_path()+'processed_data/CFHTLens/'
@@ -89,8 +89,6 @@ def main():
     
     if rank==0: print("N2: {0}".format(len(W)))
     
-    
-    fs = 1000
     #choose random sample
     condition_1 = (R['flag']==0)
     condition = condition_1
@@ -170,7 +168,7 @@ def main():
     if rank==0:
         print("radial bins:",r_bins)
     
-    result = projected_cross_two_point_correlation_function(data_1, z_gal, data_2, r_bins,\ 
+    result = projected_cross_two_point_correlation_function(data_1, z_gal, data_2, r_bins,\
                                                             cosmo=cosmo, N_theta_bins=5,\
                                                             randoms=randoms, N_threads=1,\
                                                             estimator='Davis-Peebles',\
@@ -193,7 +191,10 @@ def main():
 
 def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, cosmo=None, 
                                                    N_theta_bins=10, randoms=None,
-                                                   weights1=None, weights2=None, weights_randoms=None, 
+                                                   weights1=None, weights2=None,
+                                                   weights_randoms=None,
+                                                   aux1=None, aux2=None, aux_randoms=None,
+                                                   wf=None, 
                                                    max_sample_size=int(1e6),
                                                    estimator='Natural',
                                                    N_threads=1, comm=None):
@@ -312,7 +313,7 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
 
     #If PBCs are defined, calculate the randoms analytically. Else, the user must specify 
     #randoms and the pair counts are calculated the old fashion way.
-    def random_counts(sample1, sample2, randoms, theta_bins, PBCs, N_threads, do_RR, do_DR, comm):
+    def random_counts(sample1, sample2, randoms, theta_bins, PBCs, N_threads, do_RR, do_DR, comm, weights1, weights2, weights_randoms, aux1, aux2, aux_randoms, wf):
         """
         Count random pairs.
         """
@@ -328,12 +329,12 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
             if comm!=None:
                 if do_RR==True:
                     if rank==0: print('Running MPI pair counter for RR with {0} processes.'.format(comm.size))
-                    RR = specific_wnpairs(randoms, randoms, theta_bins, comm=comm)
+                    RR = specific_wnpairs(randoms, randoms, theta_bins, weights1=weights_randoms, weights2=weights_randoms, wf=wf, aux1=aux_randoms, aux2=aux_randoms, comm=comm)
                     RR = np.diff(RR)
                 else: RR=None
                 if do_DR==True:
                     if rank==0: print('Running MPI pair counter for D1R with {0} processes.'.format(comm.size))
-                    D1R = specific_wnpairs(sample1, randoms, theta_bins, comm=comm)
+                    D1R = specific_wnpairs(sample1, randoms, theta_bins, weights1=weights1, weights2=weights_randoms, wf=wf, aux1=aux1, aux2=aux_randoms, comm=comm)
                     D1R = np.diff(D1R)
                 else: D1R=None
                 if np.all(sample1 == sample2): #calculating the cross-correlation
@@ -343,23 +344,23 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
                     if True==False:
                     #if do_DR==True:
                         if rank==0: print('Running MPI pair counter for D2R with {0} processes.'.format(comm.size))
-                        D2R = specific_wnpairs(sample2, randoms, theta_bins, comm=comm)
+                        D2R = specific_wnpairs(sample2, randoms, theta_bins, weights1=weights2, weights2=weights_randoms, wf=wf, aux1=aux2, aux2=aux_randoms, comm=comm)
                         D2R = np.diff(D2R)
                     else: D2R=None
             elif N_threads==1:
                 if do_RR==True:
-                    RR = specific_wnpairs(randoms, randoms, theta_bins)
+                    RR = specific_wnpairs(randoms, randoms, theta_bins, weights1=weights_randoms, weights2=weights_randoms, wf=wf, aux1=aux_randoms, aux2=aux_randoms)
                     RR = np.diff(RR)
                 else: RR=None
                 if do_DR==True:
-                    D1R = specific_wnpairs(sample1, randoms, theta_bins)
+                    D1R = specific_wnpairs(sample1, randoms, theta_bins, weights1=weights1, weights2=weights_randoms, wf=wf, aux1=aux1, aux2=aux_randoms)
                     D1R = np.diff(D1R)
                 else: D1R=None
                 if np.all(sample1 == sample2): #calculating the cross-correlation
                     D2R = None
                 else:
                     if do_DR==True:
-                        D2R = specific_wnpairs(sample2, randoms, theta_bins)
+                        D2R = specific_wnpairs(sample2, randoms, theta_bins, weights1=weights2, weights2=weights_randoms, wf=wf, aux1=aux2, aux2=aux_randoms)
                         D2R = np.diff(D2R)
                     else: D2R=None
             else:
@@ -412,7 +413,7 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
         else:
             raise ValueError('Un-supported combination of PBCs and randoms provided.')
     
-    def pair_counts(sample1, sample2, weights1, weights2, theta_bins, N_threads, do_auto, do_cross, do_DD, comm):
+    def pair_counts(sample1, sample2, weights1, weights2, theta_bins, N_threads, do_auto, do_cross, do_DD, comm, aux1, aux2, wf):
         """
         Count data pairs: D1D1, D1D2, D2D2.  If a comm object is passed, the code uses a
         MPI pair counter.  Else if N_threads==1, the calculation is done serially.  Else,
@@ -421,7 +422,7 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
         if comm!=None:
             if do_auto==True:
                 if rank==0: print('Running MPI pair counter for D1D1 with {0} processes.'.format(comm.size))
-                D1D1 = specific_wnpairs(sample1, sample1, theta_bins, period=None, weights1=weights1, weights2=weights2, wf=None, comm=comm)
+                D1D1 = specific_wnpairs(sample1, sample1, theta_bins, period=None, weights1=weights1, weights2=weights1, wf=wf, aux1=aux1, aux2=aux1, comm=comm)
                 D1D1 = np.diff(D1D1)
             else: D1D1=None
             if np.all(sample1 == sample2):
@@ -430,17 +431,17 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
             else:
                 if do_cross==True:
                     if rank==0: print('Running MPI pair counter for D1D2 with {0} processes.'.format(comm.size))
-                    D1D2 = specific_wnpairs(sample1, sample2, theta_bins, period=None, weights1=weights1, weights2=weights2, wf=None, comm=comm)
+                    D1D2 = specific_wnpairs(sample1, sample2, theta_bins, period=None, weights1=weights1, weights2=weights2, wf=wf, aux1=aux1, aux2=aux2, comm=comm)
                     D1D2 = np.diff(D1D2)
                 else: D1D2=None
                 if do_auto==True:
                     if rank==0: print('Running MPI pair counter for D2D2 with {0} processes.'.format(comm.size))
-                    D2D2 = specific_wnpairs(sample2, sample2, theta_bins, period=None, weights1=weights2, weights2=weights2, wf=None, comm=comm)
+                    D2D2 = specific_wnpairs(sample2, sample2, theta_bins, period=None, weights1=weights2, weights2=weights2, wf=wf, aux1=aux2, aux2=aux2, comm=comm)
                     D2D2 = np.diff(D2D2)
                 else: D2D2=False
         elif N_threads==1:
             if do_auto==True:
-                D1D1 = specific_wnpairs(sample1, sample1, theta_bins, period=None, weights1=weights1, weights2=weights1, wf=None)
+                D1D1 = specific_wnpairs(sample1, sample1, theta_bins, period=None, weights1=weights1, weights2=weights1, wf=wf, aux1=aux1, aux2=aux1)
                 D1D1 = np.diff(D1D1)
             else: D1D1=None
             if np.all(sample1 == sample2):
@@ -448,11 +449,11 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
                 D2D2 = D1D1
             else:
                 if do_cross==True:
-                    D1D2 = specific_wnpairs(sample1, sample2, theta_bins, period=None, weights1=weights1, weights2=weights2, wf=None)
+                    D1D2 = specific_wnpairs(sample1, sample2, theta_bins, period=None, weights1=weights1, weights2=weights2, wf=wf, aux1=aux1, aux2=aux2)
                     D1D2 = np.diff(D1D2)
                 else: D1D2=None
                 if do_auto==True:
-                    D2D2 = specific_wnpairs(sample2, sample2, theta_bins, period=None, weights1=weights2, weights2=weights2, wf=None)
+                    D2D2 = specific_wnpairs(sample2, sample2, theta_bins, period=None, weights1=weights2, weights2=weights2, wf=wf, aux1=aux2, aux2=aux2)
                     D2D2 = np.diff(D2D2)
                 else: D2D2=False
         else:
@@ -460,7 +461,7 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
             inds2 = np.arange(0,len(sample2)) #indices into sample2
             if do_auto==True:
                 #split sample1 into subsamples for list of args to pass to the pair counter
-                args = [[sample1[chunk],sample1,theta_bins, None, weights1[chunk], weights1, None] for chunk in np.array_split(inds1,N_threads)]
+                args = [[sample1[chunk],sample1,theta_bins, None, weights1[chunk], weights1, wf, aux1[chunk], aux1] for chunk in np.array_split(inds1,N_threads)]
                 D1D1 = np.sum(pool.map(_specific_wnpairs_wrapper,args),axis=0)
                 D1D1 = np.diff(D1D1)
             else: D1D1=None
@@ -470,13 +471,13 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
             else:
                 if do_cross==True:
                     #split sample1 into subsamples for list of args to pass to the pair counter
-                    args = [[sample1[chunk],sample2,theta_bins, None, weights1[chunk], weights2, None] for chunk in np.array_split(inds1,N_threads)]
+                    args = [[sample1[chunk],sample2,theta_bins, None, weights1[chunk], weights2, wf, aux1[chunk], aux2] for chunk in np.array_split(inds1,N_threads)]
                     D1D2 = np.sum(pool.map(_specific_wnpairs_wrapper,args),axis=0)
                     D1D2 = np.diff(D1D2)
                 else: D1D2=None
                 if do_auto==True:
                    #split sample2 into subsamples for list of args to pass to the pair counter
-                    args = [[sample2[chunk],sample2,theta_bins, None, weights2[chunk], weights2, None] for chunk in np.array_split(inds2,N_threads)]
+                    args = [[sample2[chunk],sample2,theta_bins, None, weights2[chunk], weights2, wf, aux2[chunk], aux2] for chunk in np.array_split(inds2,N_threads)]
                     D2D2 = np.sum(pool.map(_specific_wnpairs_wrapper,args),axis=0)
                     D2D2 = np.diff(D2D2)
                 else: D2D2=None
@@ -543,6 +544,9 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
         N1 = 1.0
         N2 = 1.0
         NR = 1.0
+    N1 = np.sum(weights1)
+    N2 = np.sum(weights2)
+    NR = np.sum(weights_randoms)
     
     def proj_r_to_angular_bins(r_bins, z, N_sample, cosmo):
         """
@@ -595,9 +599,9 @@ def projected_cross_two_point_correlation_function(sample1, z, sample2, r_bins, 
     
     #count pairs
     if rank==0: print('counting data pairs...')
-    D1D1,D1D2,D2D2 = pair_counts(xyz_1, xyz_2, weights1, weights2, c_bins, N_threads, do_auto, do_cross, do_DD, comm)
+    D1D1,D1D2,D2D2 = pair_counts(xyz_1, xyz_2, weights1, weights2, c_bins, N_threads, do_auto, do_cross, do_DD, comm, aux1, aux2, wf)
     if rank==0: print('counting random pairs...')
-    D1R, D2R, RR = random_counts(xyz_1, xyz_2, xyz_randoms, c_bins, PBCs, N_threads, do_RR, do_DR, comm)
+    D1R, D2R, RR = random_counts(xyz_1, xyz_2, xyz_randoms, c_bins, PBCs, N_threads, do_RR, do_DR, comm, weights1, weights2, weights_randoms, aux1, aux2, aux_randoms, wf)
     if rank==0: print('done counting pairs.')
     
     #covert angular pair counts to projected pair counts
